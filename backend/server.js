@@ -24,6 +24,12 @@ app.get('/', (req, res) => {
     res.send("API Working Bang!");
 });
 
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(port, () => {
+        console.log(`Server jalan di port ${port}`);
+    });
+}
+
 app.listen(port, () => {
     console.log(`Server jalan di port ${port}`);
 });

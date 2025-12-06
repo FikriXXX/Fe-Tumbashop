@@ -55,7 +55,6 @@ const ListProduct = ({ token }) => {
             </div>
 
             <div className='bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm'>
-                {/* Table Header */}
                 <div className='hidden md:grid grid-cols-[1fr_3fr_1fr_1fr_1fr] bg-gray-50 border-b border-gray-200 py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider'>
                     <span>Gambar</span>
                     <span>Nama Produk</span>
@@ -68,7 +67,6 @@ const ListProduct = ({ token }) => {
                 <div className="divide-y divide-gray-100">
                     {list.map((item, index) => (
                         <div key={index} className='grid grid-cols-[1fr_3fr_1fr] md:grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center gap-4 py-4 px-6 hover:bg-gray-50 transition duration-150 group'>
-                            {/* Image */}
                             <div className="h-16 w-16 rounded-xl bg-gray-100 overflow-hidden border border-gray-200 flex-shrink-0 shadow-sm">
                                 {item.image && item.image.length > 0 ? (
                                     <img className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-110' src={item.image[0]} alt={item.name} />
