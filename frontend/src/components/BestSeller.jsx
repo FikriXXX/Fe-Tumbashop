@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import { ShopContext } from '../context/ShopContext';
-import Tittle from './Tittle'; // Asumsi komponen Tittle sudah ada
+import Tittle from './Tittle';
 import ProductItem from './ProductItem';
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 
@@ -26,17 +26,16 @@ const BestSeller = () => {
     };
 
     if (bestSeller.length === 0) {
-        return null; // Jangan render apapun jika tidak ada produk bestseller
+        return null; 
     }
 
     return (
         <div className='my-20 py-16 bg-stone-50'>
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-                {/* Header Section */}
                 <div className='flex flex-col sm:flex-row justify-between items-center mb-10'>
                     <div className='text-center text-2xl md:text-2xl sm:text-left'>
                         <Tittle text1={'Our'} text2={'Best Sellers'} />
-                        <p className='mt-2  text-gray-600 max-w-lg'>
+                        <p className='mt-2 text-gray-600 max-w-lg'>
                             Koleksi pilihan yang paling dicintai oleh pelanggan kami. Temukan favorit baru Anda di sini.
                         </p>
                     </div>
@@ -45,9 +44,7 @@ const BestSeller = () => {
                     </a>
                 </div>
 
-                {/* Horizontal Scrolling Product List */}
                 <div className='relative'>
-                    {/* Tombol Scroll Kiri */}
                     <button onClick={() => scroll('left')} className='absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 bg-white rounded-full p-3 shadow-md z-10 hover:bg-gray-100 transition hidden lg:flex'>
                         <FiArrowLeft />
                     </button>
@@ -68,7 +65,6 @@ const BestSeller = () => {
                         ))}
                     </div>
                     
-                    {/* Tombol Scroll Kanan */}
                     <button onClick={() => scroll('right')} className='absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/2 bg-white rounded-full p-3 shadow-md z-10 hover:bg-gray-100 transition hidden lg:flex'>
                         <FiArrowRight />
                     </button>

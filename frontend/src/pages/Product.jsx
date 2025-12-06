@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
 import ProductItem from '../components/ProductItem';
-import { FiShoppingCart } from 'react-icons/fi';
+import { FiShoppingCart, FiHeart } from 'react-icons/fi';
 
 const Product = () => {
     const { productId } = useParams();
@@ -22,16 +22,29 @@ const Product = () => {
                 setQuantity(1);
                 window.scrollTo(0, 0);
             } else {
-                navigate('/collection'); 
+                navigate('/collection');
             }
         }
     }, [productId, contextValue, navigate]);
+
+    const { addToCart, currency, isInWishlist, addToWishlist, removeFromWishlist } = contextValue || {};
+
+    const isWishlisted = product && isInWishlist ? isInWishlist(product._id) : false;
+
+    const handleWishlistToggle = () => {
+        if (!product) return;
+        if (isWishlisted) {
+            removeFromWishlist && removeFromWishlist(product._id);
+        } else {
+            addToWishlist && addToWishlist(product._id);
+        }
+    };
+
 
     if (!product || !contextValue) {
         return <div className='text-center my-24'>Loading...</div>;
     }
 
-    const { addToCart, currency } = contextValue;
     const relatedProducts = contextValue.products
         .filter(p => p.category === product.category && p._id !== product._id)
         .slice(0, 4);
@@ -40,13 +53,13 @@ const Product = () => {
         <div className='py-12 lg:py-20 bg-white'>
             <div className='max-w-6xl mx-auto px-4'>
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start'>
-                    
+
                     <div className='lg:sticky top-8 self-start'>
                         <div className='flex flex-col-reverse sm:flex-row gap-4'>
                             <div className='flex sm:flex-col gap-3'>
                                 {product.image.map((img, index) => (
-                                    <div 
-                                        key={index} 
+                                    <div
+                                        key={index}
                                         className={`w-16 h-16 cursor-pointer border-2 rounded-md overflow-hidden ${mainImage === img ? 'border-yellow-950' : 'border-transparent'}`}
                                         onMouseEnter={() => setMainImage(img)}
                                     >
@@ -63,11 +76,21 @@ const Product = () => {
                     <div className='flex flex-col gap-5'>
                         <div>
                             <p className='text-sm text-gray-500 mb-1'>{product.category} &gt; {product.subCategory}</p>
-                            <h1 className='text-3xl md:text-4xl font-bold text-gray-900'>{product.name}</h1>
+                            <div className='flex items-start justify-between gap-4'>
+                                <h1 className='text-3xl md:text-4xl font-bold text-gray-900'>{product.name}</h1>
+                                <button
+                                    onClick={handleWishlistToggle}
+                                    className={`p-3 rounded-full transition-colors duration-200 mt-1 ${isWishlisted ? 'bg-red-100 text-red-500' : 'bg-gray-100 text-gray-500 hover:text-red-500'
+                                        }`}
+                                    aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                                >
+                                    <FiHeart fill={isWishlisted ? 'currentColor' : 'none'} className='w-5 h-5' />
+                                </button>
+                            </div>
                         </div>
                         <p className='text-3xl font-semibold text-yellow-950'>{currency} {product.price.toLocaleString('id-ID')}</p>
                         <p className='text-gray-600 leading-relaxed'>{product.description}</p>
-                        
+
                         <div>
                             <h3 className='font-semibold mb-2'>Select Size:</h3>
                             <div className='flex gap-2'>
@@ -83,11 +106,11 @@ const Product = () => {
                                 <span className='w-10 h-10 flex items-center justify-center'>{quantity}</span>
                                 <button onClick={() => setQuantity(q => q + 1)} className='w-10 h-10 text-xl'>+</button>
                             </div>
-                            <button 
+                            <button
                                 onClick={() => addToCart(product._id)}
                                 className='flex-grow flex items-center justify-center gap-3 bg-black text-white py-3 rounded-md font-semibold hover:bg-gray-800 transition'
                             >
-                                <FiShoppingCart/>
+                                <FiShoppingCart />
                                 <span>Add to Cart</span>
                             </button>
                         </div>

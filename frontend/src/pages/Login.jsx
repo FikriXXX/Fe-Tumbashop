@@ -1,110 +1,82 @@
-// src/pages/Login.jsx
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // If you have links like "Forgot Password"
+import React, { useContext, useState, useEffect } from 'react';
+import { ShopContext } from '../context/ShopContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Login = () => {
-    // State to toggle between Login and Sign Up
-    const [isLogin, setIsLogin] = useState(true); 
-    
-    // State for form data (example)
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: ''
-    });
+    const [currentState, setCurrentState] = useState('Login');
+    const { token, setToken, navigate, backendUrl } = useContext(ShopContext);
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => {
-        setFormData({...formData, [e.target.name]: e.target.value});
-    };
-
-    const handleSubmit = (e) => {
+    const onSubmitHandler = async (e) => {
         e.preventDefault();
-        if (isLogin) {
-            alert(`Logging in with Email: ${formData.email}`);
-            // Add actual login logic here (e.g., API call)
-        } else {
-            alert(`Signing up with Name: ${formData.name}, Email: ${formData.email}`);
-            // Add actual sign up logic here (e.g., API call)
+        setLoading(true);
+        try {
+            if (currentState === 'Sign Up') {
+                const response = await axios.post(backendUrl + '/api/user/register', { name, email, password });
+                if (response.data.success) {
+                    setToken(response.data.token);
+                    localStorage.setItem('token', response.data.token);
+                    toast.success("Welcome to Tumbashop!");
+                } else {
+                    toast.error(response.data.message);
+                }
+            } else {
+                const response = await axios.post(backendUrl + '/api/user/login', { email, password });
+                if (response.data.success) {
+                    setToken(response.data.token);
+                    localStorage.setItem('token', response.data.token);
+                    toast.success("Welcome back!");
+                } else {
+                    toast.error(response.data.message);
+                }
+            }
+        } catch (error) {
+            toast.error(error.message);
+        } finally {
+            setLoading(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        if (token) navigate('/');
+    }, [token, navigate]);
 
     return (
-        <div className='min-h-[calc(100vh-200px)] flex items-center justify-center bg-stone-50 py-12 px-4 sm:px-6 lg:px-8'>
-            <div className='max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg'>
-                <div>
-                    <h2 className='mt-6 text-center text-3xl font-bold text-gray-900'>
-                        {isLogin ? 'Login to your account' : 'Create an account'}
-                    </h2>
-                </div>
-                <form className='mt-8 space-y-6' onSubmit={handleSubmit}>
-                    {/* Input fields */}
-                    <div className='rounded-md shadow-sm -space-y-px'>
-                        {!isLogin && ( // Only show Name field on Sign Up
-                            <div>
-                                <label htmlFor="name" className="sr-only">Name</label>
-                                <input
-                                    id="name"
-                                    name="name"
-                                    type="text"
-                                    required={!isLogin}
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-yellow-900 focus:border-yellow-900 focus:z-10 sm:text-sm"
-                                    placeholder="Your Name"
-                                />
-                            </div>
-                        )}
-                        <div>
-                            <label htmlFor="email-address" className="sr-only">Email address</label>
-                            <input
-                                id="email-address"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                required
-                                value={formData.email}
-                                onChange={handleChange}
-                                className={`appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 ${isLogin ? 'rounded-t-md' : ''} focus:outline-none focus:ring-yellow-900 focus:border-yellow-900 focus:z-10 sm:text-sm`}
-                                placeholder="Email address"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="sr-only">Password</label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete="current-password"
-                                required
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-yellow-900 focus:border-yellow-900 focus:z-10 sm:text-sm"
-                                placeholder="Password"
-                            />
-                        </div>
-                    </div>
+        <div className="min-h-[80vh] flex items-center justify-center py-10 px-4 bg-white">
+            <form onSubmit={onSubmitHandler} className='flex flex-col items-center w-full max-w-sm gap-6'>
 
-                    {/* Submit Button */}
-                    <div>
-                        <button
-                            type="submit"
-                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition"
-                        >
-                            {isLogin ? 'Sign in' : 'Sign up'}
-                        </button>
-                    </div>
-                </form>
-
-                {/* Toggle Link */}
-                <div className="text-sm text-center">
-                    <button 
-                        onClick={() => setIsLogin(!isLogin)} 
-                        className="font-medium text-yellow-900 hover:text-yellow-700"
-                    >
-                        {isLogin ? 'Don\'t have an account? Sign up' : 'Already have an account? Login'}
-                    </button>
+                {/* Header */}
+                <div className='flex flex-col items-center gap-2 mb-4'>
+                    <h1 className='text-3xl font-serif text-gray-900 tracking-wide'>
+                        {currentState}
+                    </h1>
+                    <div className='w-16 h-[1.5px] bg-gray-800'></div>
                 </div>
-            </div>
+
+                <div className="w-full space-y-4">
+                    {currentState === 'Sign Up' && (
+                        <input onChange={(e) => setName(e.target.value)} value={name} type="text" className='w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:border-black outline-none transition' placeholder='Full Name' required />
+                    )}
+                    <input onChange={(e) => setEmail(e.target.value)} value={email} type="email" className='w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:border-black outline-none transition' placeholder='Email Address' required />
+                    <input onChange={(e) => setPassword(e.target.value)} value={password} type="password" className='w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:border-black outline-none transition' placeholder='Password' required />
+                </div>
+
+                <div className='w-full flex justify-between text-sm mt-[-4px]'>
+                    <p className='cursor-pointer text-gray-500 hover:text-black transition'>Forgot your password?</p>
+                    {currentState === 'Login'
+                        ? <p onClick={() => setCurrentState('Sign Up')} className='cursor-pointer text-gray-800 font-semibold hover:underline'>Create account</p>
+                        : <p onClick={() => setCurrentState('Login')} className='cursor-pointer text-gray-800 font-semibold hover:underline'>Login Here</p>
+                    }
+                </div>
+
+                <button disabled={loading} className='w-full bg-black text-white font-medium px-8 py-3.5 mt-2 hover:bg-gray-900 transition active:scale-95 disabled:opacity-70'>
+                    {loading ? "Processing..." : (currentState === 'Login' ? 'Sign In' : 'Sign Up')}
+                </button>
+            </form>
         </div>
     );
 };

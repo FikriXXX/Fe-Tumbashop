@@ -1,21 +1,56 @@
-import React, { createContext, useState } from "react";
-import { products as allProductsData } from "../assets/assets";
+import React, { createContext, useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export const ShopContext = createContext(null);
 
 const ShopContextProvider = (props) => {
-    // --- State & Data Dasar ---
     const currency = 'Rp.';
     const delivery_fee = 15000;
+    const backendUrl = "http://localhost:4000";
+    const navigate = useNavigate();
+
+    const [products, setProducts] = useState([]);
     const [search, setSearch] = useState('');
     const [showSearch, setShowSearch] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-    // ---Logika Keranjang ---
     const [cartItems, setCartItems] = useState({});
+    const [wishlistItems, setWishlistItems] = useState({});
+    const [orders, setOrders] = useState([]);
+    const [token, setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : "");
+
+    const getProductsData = async () => {
+        try {
+            const response = await axios.get(backendUrl + '/api/products/list');
+            console.log("Data dari Backend:", response.data);
+            if (response.data.success) {
+                setProducts(response.data.products);
+            } else {
+                toast.error("Gagal: " + response.data.message);
+            }
+        } catch (error) {
+            console.error("Eror Fetch:", error);
+            toast.error("Gagal koneksi ke server");
+        }
+    };
+
+    useEffect(() => {
+        getProductsData();
+    }, []);
+
+    useEffect(() => {
+        if (!token && localStorage.getItem('token')) {
+            setToken(localStorage.getItem('token'));
+        }
+    }, [token]);
 
     const addToCart = (itemId, quantity = 1) => {
-        setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + quantity }));
+        setCartItems((prev) => {
+            const newCart = { ...prev };
+            newCart[itemId] = (newCart[itemId] || 0) + quantity;
+            return newCart;
+        });
+        toast.success("Item added to cart");
     };
 
     const removeFromCart = (itemId) => {
@@ -29,13 +64,11 @@ const ShopContextProvider = (props) => {
             return newCart;
         });
     };
-    
+
     const deleteFromCart = (itemId) => {
         setCartItems((prev) => {
             const newCart = { ...prev };
-            if (newCart[itemId]) {
-                delete newCart[itemId];
-            }
+            delete newCart[itemId];
             return newCart;
         });
     };
@@ -44,7 +77,7 @@ const ShopContextProvider = (props) => {
         let totalAmount = 0;
         for (const item in cartItems) {
             if (cartItems[item] > 0) {
-                let itemInfo = allProductsData.find((product) => product._id === item);
+                let itemInfo = products.find((product) => product._id === item);
                 if (itemInfo) {
                     totalAmount += itemInfo.price * cartItems[item];
                 }
@@ -53,36 +86,68 @@ const ShopContextProvider = (props) => {
         return totalAmount;
     };
 
-    // --- Logika Login/Logout ---
-    const login = (email) => {
-        console.log(`User logged in: ${email}`);
-        setIsLoggedIn(true);
+    const clearCart = () => setCartItems({});
+
+    const toggleWishlist = (itemId) => {
+        setWishlistItems((prev) => {
+            const newWishlist = { ...prev };
+            if (newWishlist[itemId]) {
+                delete newWishlist[itemId];
+                toast.info("Removed from wishlist");
+            } else {
+                newWishlist[itemId] = true;
+                toast.success("Added to wishlist");
+            }
+            return newWishlist;
+        });
+    };
+
+    const addOrder = async (items, totalAmount, shippingDetails) => {
+        const orderId = `#ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        const date = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+        const newOrder = {
+            id: orderId,
+            date: date,
+            status: 'Processing',
+            total: totalAmount,
+            items: items,
+            shipping: shippingDetails
+        };
+
+        setOrders(prevOrders => [newOrder, ...prevOrders]);
+
+        try {
+            const response = await axios.post(backendUrl + '/api/orders/place', newOrder);
+            if (response.data.success) {
+                console.log("Order saved to database");
+            } else {
+                console.error("Failed to save order:", response.data.message);
+            }
+        } catch (error) {
+            console.error("Error creating order:", error);
+        }
+
+        return orderId;
     };
 
     const logout = () => {
-        console.log("User logged out");
-        setIsLoggedIn(false);
-
+        localStorage.removeItem('token');
+        setToken('');
+        setCartItems({});
+        navigate('/login');
     };
 
-    // --- Nilai yang Dibagikan oleh Context ---
     const value = {
-        products: allProductsData, 
-        currency,
-        delivery_fee,
-        search,
-        setSearch,
-        showSearch,
-        setShowSearch,
-        isLoggedIn,
-        login,
-        logout,
-        cartItems,
-        addToCart,
-        removeFromCart,
-        deleteFromCart,
-        getCartTotalAmount,
+        products, currency, delivery_fee,
+        search, setSearch, showSearch, setShowSearch,
+        cartItems, addToCart, removeFromCart, deleteFromCart, getCartTotalAmount, clearCart,
+        wishlistItems, toggleWishlist,
+        orders, addOrder,
+        backendUrl, token, setToken, navigate, logout
     };
+
+
 
     return (
         <ShopContext.Provider value={value}>

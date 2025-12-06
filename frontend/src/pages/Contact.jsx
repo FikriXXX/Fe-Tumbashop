@@ -1,6 +1,4 @@
 import React from 'react';
-// Impor ikon dari react-icons
-// Jalankan: npm install react-icons
 import { FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 
 const Contact = () => {
@@ -8,7 +6,6 @@ const Contact = () => {
         <div className='py-16 lg:py-24 bg-stone-50'>
             <div className='max-w-6xl mx-auto px-4'>
 
-                {/* Judul Halaman */}
                 <div className='text-center mb-16'>
                     <h1 className='text-4xl md:text-5xl font-bold text-gray-800 font-montserrat'>
                         Hubungi Kami
@@ -18,10 +15,8 @@ const Contact = () => {
                     </p>
                 </div>
 
-                {/* Konten Utama: Form & Detail Kontak */}
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start'>
 
-                    {/* Kolom Kiri: Formulir Kontak */}
                     <div className='bg-white p-8 rounded-lg shadow-md'>
                         <h2 className='text-2xl font-semibold text-gray-900 mb-6'>Kirim Pesan</h2>
                         <form action="#" method="POST" className='space-y-6'>
@@ -69,7 +64,6 @@ const Contact = () => {
                         </form>
                     </div>
 
-                    {/* Kolom Kanan: Detail Kontak & Peta */}
                     <div className='space-y-8'>
                         <div className='bg-white p-8 rounded-lg shadow-md'>
                             <h2 className='text-2xl font-semibold text-gray-900 mb-6'>Info Kontak</h2>
@@ -89,7 +83,6 @@ const Contact = () => {
                             </div>
                         </div>
                         <div className='overflow-hidden rounded-lg shadow-md'>
-                            {/*Map */}
                             <iframe
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.412321453121!2d106.8227658749912!3d-6.340912193649692!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69ec011f973e05%3A0x6b399694e976644!2sJl.%20Nangka%20Raya%20No.58C%2C%20RT.7%2FRW.5%2C%20Tj.%20Bar.%2C%20Kec.%20Jagakarsa%2C%20Kota%20Jakarta%20Selatan%2C%20Daerah%20Khusus%20Ibukota%20Jakarta%2012530!5e0!3m2!1sen!2sid!4v1727530512345!5m2!1sen!2sid"
                                 className='w-full h-64 border-0'

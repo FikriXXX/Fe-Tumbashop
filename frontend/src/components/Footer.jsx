@@ -36,7 +36,6 @@ const Footer = () => {
                             <li><Link to="/contact" className='hover:text-black transition-colors'>Hubungi Kami</Link></li>
                             <li><Link to="/privacy-policy" className='hover:text-black transition-colors'>Kebijakan Privasi</Link></li> 
                             <li><Link to="/testimonials" className='hover:text-black transition-colors'>Testimoni</Link></li>
-
                         </ul>
                     </div>
 

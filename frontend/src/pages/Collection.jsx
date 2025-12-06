@@ -5,7 +5,6 @@ import Tittle from '../components/Tittle';
 import ProductItem from '../components/ProductItem';
 
 const Collection = () => {
-    // (FIX) Ganti 'searchTerm' menjadi 'search' agar sesuai dengan context
     const { products, search } = useContext(ShopContext) || {};
     const [showFilter, setShowFilter] = useState(true);
 
@@ -72,11 +71,10 @@ const Collection = () => {
 
         setFilteredProducts(sortedProducts);
 
-    }, [products, selectedCategories, selectedSubCategories, sortType, search]); // <-- (FIX) Ganti 'searchTerm' menjadi 'search'
+    }, [products, selectedCategories, selectedSubCategories, sortType, search]);
 
     return (
         <div className='flex flex-col sm:flex-row gap-8 pt-10 border-t px-4'>
-            {/* ... (bagian filter tidak berubah) ... */}
             <div className='w-full sm:w-60'>
                 <div onClick={() => setShowFilter(!showFilter)} className='my-2 text-xl flex items-center justify-between cursor-pointer'>
                     <p>Filters</p>
